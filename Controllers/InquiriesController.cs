@@ -102,6 +102,10 @@ namespace WebApplication2.Controllers
             var inquiry = await _context.Inquiry.SingleOrDefaultAsync(m => m.InquiryId == id);
             if (inquiry == null)
             {
+                var service = CRM.CrmService.GetServiceProvider();
+                var crmInquiry = service.Retrieve("fp_inquiry", inquiry.InquiryId, new Microsoft.Xrm.Sdk.Query.ColumnSet("fp_response"));
+
+                inquiry.Response = crmInquiry.GetAttributeValue<string>("fp_response");
                 return NotFound();
             }
             return View(inquiry);
@@ -124,6 +128,12 @@ namespace WebApplication2.Controllers
                 try
                 {
                     _context.Update(inquiry);
+
+                    var service = CRM.CrmService.GetServiceProvider();
+                    var crmInquiry = service.Retrieve("fp_inquiry", inquiry.InquiryId, new Microsoft.Xrm.Sdk.Query.ColumnSet("fp_question"));
+                    crmInquiry["fp_question"] = inquiry.Question;
+                    service.Update(crmInquiry);
+
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
@@ -168,6 +178,13 @@ namespace WebApplication2.Controllers
             var inquiry = await _context.Inquiry.SingleOrDefaultAsync(m => m.InquiryId == id);
             _context.Inquiry.Remove(inquiry);
             await _context.SaveChangesAsync();
+
+            var service = CRM.CrmService.GetServiceProvider();
+
+            service.Delete("fp_inquiry", id);
+
+           
+
             return RedirectToAction("Index");
         }
 
