@@ -26,7 +26,7 @@ namespace WebApplication2.CRM
             var builder = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile("secrets.json");
 
             Configuration = builder.Build();
-
+            
             //var credentials = new System.Net.NetworkCredential(Configuration["crmcreds:username"], Configuration["crmcreds:password"], Configuration["crmcreds:domain"]);
             //conn = new CrmServiceClient(credentials,
             //   "workspace-justice-local-dev.crm.egcs.fmt-tgf.com",
